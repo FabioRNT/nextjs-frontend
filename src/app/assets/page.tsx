@@ -7,15 +7,15 @@ import {
   TableHeadCell,
   TableRow,
 } from "flowbite-react";
-import { AssetShow } from "../components/AssetShow";
-import { WalletList } from "../components/WalletList";
+import { AssetShow } from "../../components/AssetShow";
+import { WalletList } from "../../components/WalletList";
+import { getAssets, getMyWallet } from "@/queries/queries";
 import Link from "next/link";
-import { getMyWallet } from "@/queries/queries";
 
-export default async function MyWalletListPage({
+export default async function AssetsListPage({
   searchParams,
 }: {
-  searchParams: { wallet_id: string };
+  searchParams: Promise<{ wallet_id: string }>;
 }) {
   const { wallet_id } = await searchParams;
 
@@ -28,33 +28,31 @@ export default async function MyWalletListPage({
   if (!wallet) {
     return <WalletList />;
   }
-
+  const assets = await getAssets();
   return (
     <div className="flex flex-col space-y-5 flex-grow">
       <article className="format">
-        <h1>My Wallet</h1>
+        <h1>Assets</h1>
       </article>
       <div className="overflow-x-auto w-full">
         <Table className="w-full max-w-full">
           <TableHead>
             <TableHeadCell>Asset</TableHeadCell>
             <TableHeadCell>Quotation</TableHeadCell>
-            <TableHeadCell>Quantity</TableHeadCell>
             <TableHeadCell>Buy/Sell</TableHeadCell>
           </TableHead>
           <TableBody>
-            {wallet.assets.map((walletAsset, key) => (
+            {assets.map((asset, key) => (
               <TableRow key={key}>
                 <TableCell>
-                  <AssetShow asset={walletAsset.asset} />
+                  <AssetShow asset={asset} />
                 </TableCell>
-                <TableCell>$ {walletAsset.asset.price}</TableCell>
-                <TableCell>{walletAsset.shares}</TableCell>
+                <TableCell>$ {asset.price}</TableCell>
                 <TableCell>
                   <Button
                     color="light"
                     as={Link}
-                    href={`/assets/${walletAsset.asset.symbol}?wallet_id=${wallet_id}`}
+                    href={`/assets/${asset.symbol}?wallet_id=${wallet_id}`}
                   >
                     Buy/Sell
                   </Button>
